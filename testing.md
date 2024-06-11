@@ -99,3 +99,95 @@ Benefits
     • TDD Cycle: Red (fail), Green (pass), Refactor (optimise)
     • Benefits: Ensures functionality, facilitates collaboration, enforces modularity, and reduces unnecessary code
     • Practice: Write tests first, then code, and continuously refactor for optimal results
+
+
+# Determining Common Test Cases
+
+Knowing how much to test can be challenging. Too many tests can slow down development, while too few can miss key errors or edge cases. This guide will help you approach writing specs for common use cases, unintuitive cases, and edge cases.
+
+* Two Main Reasons for Test Specs
+    1. Specification: Tests are created before writing code to specify what should be built, guiding the developer
+    2. Regression Prevention: Tests prevent future changes from breaking the code. Good initial tests help maintain this
+
+* Example: Sticker Distribution Algorithm
+Andrea, a kindergarten teacher, wants to give stickers to children based on their performance ratings. Each child should get at least one sticker, with higher-rated children getting more stickers than their neighbours.
+
+* Test Cases
+
+    1. Common Use Case:
+        • For ratings `[1, 2, 3, 4]`, the stickers needed are `1 + 2 + 3 + 4 = 10`
+        ```js
+        describe('Stickers', function () {
+            it('should give 10 stickers to students ranked [1, 2, 3, 4]', function () {
+                const stickers = countStickers([1, 2, 3, 4]);
+                expect(stickers).to.equal(10);
+            });
+        });
+        ```
+
+    2. Adding a Non-Unique Test:
+        • Adding a similar test for `[1, 2, 3, 4, 5]` doesn't test anything new
+
+    3. Unintuitive Case:
+        • For `[1, 2, 3, 4, 3]`, the total stickers needed are `1 + 2 + 3 + 4 + 1 = 11`
+        ```js
+        it('should give a lower-ranked neighbor 1 sticker', function () {
+            const stickers = countStickers([1, 2, 3, 4, 3]);
+            expect(stickers).to.equal(11);
+        });
+        ```
+
+    4. Complex Unintuitive Case:
+        • For `[1, 2, 3, 4, 3, 1]`, the total is `1 + 2 + 3 + 4 + 2 + 1 = 13`
+        ```js
+        it(`should raise the sticker count if lower than its neighbour`, function () {
+            const stickers = countStickers([1, 2, 3, 4, 3, 1]);
+            expect(stickers).to.equal(13);
+        });
+        ```
+
+    5. Backward Increase:
+        • For `[1, 3, 5, 4, 3, 2, 1]`, the total is `1 + 2 + 5 + 4 + 3 + 2 + 1 = 18`
+        ```js
+        it('should increase the sticker count far backwards if needed', function () {
+            const stickers = countStickers([1, 3, 5, 4, 3, 2, 1]);
+            expect(stickers).to.equal(18);
+        });
+        ```
+
+* Testing Edge Cases
+
+    • Improper Inputs:
+    ```js
+    it('should return `undefined` with improper inputs', function () {
+        const stickers = countSticker(['one', 'two', 'three']);
+        expect(stickers).to.equal(undefined);
+    });
+    ```
+
+    • Empty Array:
+    ```js
+    it('should return 0 with an empty array', function () {
+        const stickers = countStickers([]);
+        expect(stickers).to.equal(0);
+    });
+    ```
+
+    • Large Inputs:
+    ```js
+    it('should work with 10000 students', function () {
+        let largeRankings = [];
+        let total = 0;
+        for (let i = 1; i <= 10000; i++) {
+            largeRanking.push(i);
+            total += i;
+        }
+        const stickers = countStickers(largeRankings);
+        expect(stickers).to.equal(total)
+    });
+    ```
+    • Be cautious with large input tests as they can slow down development. Only include them if they are realistic for the problem domain
+
+* Summary
+    • Learnt how to write test cases for common, unintuitive, and edge cases
+    • Proper testing helps to understand problems better and ensures robust code, which is critical for reliable software development
